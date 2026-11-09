@@ -1,0 +1,92 @@
+name: Voice samples
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: podcast
+  cancel-in-progress: false
+
+jobs:
+  samples:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install edge-tts
+        run: pip install edge-tts
+
+      - name: Make samples
+        run: |
+          python - <<'PY'
+          import asyncio, pathlib, edge_tts
+
+          TEXT = (
+              "Good morning. This is your morning brief for Tuesday, November tenth. "
+              "Weather today is 8 degrees, partly cloudy. The high will be 13 and the low 5 degrees. "
+              "You have 2 appointments in the next 24 hours: 10:00 AM, Production meeting; 2:00 PM, Planning review. "
+              "Now, the top story in AI today. First, from WIRED: World models are shifting AI from text to simulating real-world physics. "
+              "Why it matters: this is a critical frontier for robotics and autonomous vehicles."
+          )
+
+          VOICES = [
+              "en-US-AriaNeural",
+              "en-US-AvaMultilingualNeural",
+              "en-US-AndrewMultilingualNeural",
+              "en-US-EmmaMultilingualNeural",
+              "en-US-BrianMultilingualNeural",
+              "en-US-JennyNeural",
+              "en-GB-SoniaNeural",
+          ]
+
+          out = pathlib.Path("docs/voices")
+          out.mkdir(parents=True, exist_ok=True)
+
+          async def one(v):
+              try:
+                  await edge_tts.Communicate(TEXT, v).save(str(out / (v + ".mp3")))
+                  return v, True
+              except Exception as e:
+                  print("FAILED", v, type(e).__name__, str(e)[:100])
+                  return v, False
+
+          async def main():
+              res = []
+              for v in VOICES:
+                  res.append(await one(v))
+              return res
+
+          res = asyncio.run(main())
+
+          rows = "".join(
+              '<li style="margin:1.2rem 0"><strong>%s</strong><br><audio controls preload="none" src="%s.mp3"></audio></li>' % (v, v)
+              for v, ok in res if ok
+          )
+
+          page = (
+              '<!doctype html><meta charset="utf-8">'
+              '<meta name="viewport" content="width=device-width, initial-scale=1">'
+              '<title>Voice samples</title>'
+              '<body style="font-family:sans-serif;max-width:40rem;margin:2rem auto;padding:0 1rem">'
+              '<h1>Voice samples</h1><ul style="list-style:none;padding:0">' + rows + "</ul></body>"
+          )
+
+          (out / "index.html").write_text(page, encoding="utf-8")
+          print("OK voices:", [v for v, ok in res if ok])
+          PY
+
+      - name: Publish
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A docs/voices
+          git commit -m "Voice samples" || echo "Nothing to commit"
+          git push
