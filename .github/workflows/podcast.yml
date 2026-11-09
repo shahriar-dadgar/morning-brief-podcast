@@ -33,6 +33,7 @@ jobs:
         env:
           APPS_SCRIPT_URL: ${{ secrets.APPS_SCRIPT_URL }}
           PODCAST_TOKEN: ${{ secrets.PODCAST_TOKEN }}
+          TTS_VOICE: en-US-EmmaMultilingualNeural
         run: python build_episode.py
 
       - name: Publish
