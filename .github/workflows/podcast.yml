@@ -2,10 +2,10 @@ name: Build morning brief episode
 
 on:
   schedule:
-    # 08:47 and 09:47 Tehran (UTC+3:30). Off-the-hour minutes are dropped less
+    # 07:32 and 08:02 Tehran (UTC+3:30). Off-the-hour minutes are dropped less
     # often by GitHub; the second run is a backup (the build is idempotent).
-    - cron: "17 5 * * *"
-    - cron: "17 6 * * *"
+    - cron: "2 4 * * *"
+    - cron: "32 4 * * *"
   workflow_dispatch: {}
 
 permissions:
