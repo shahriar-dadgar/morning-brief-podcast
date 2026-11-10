@@ -213,10 +213,12 @@ def build_feed(base):
         "    <language>en</language>\n"
         "    <itunes:author>%s</itunes:author>\n"
         "    <itunes:explicit>false</itunes:explicit>\n"
+        '    <itunes:image href="%s/cover.jpg"/>\n'
+        "    <image><url>%s/cover.jpg</url><title>%s</title><link>%s/</link></image>\n"
         "%s\n"
         "  </channel>\n"
         "</rss>\n"
-    ) % (show, base, show, "\n".join(items))
+    ) % (show, base, show, base, base, show, base, "\n".join(items))
 
     (DOCS / "feed.xml").write_text(feed, encoding="utf-8")
 
@@ -234,7 +236,9 @@ def build_index(base):
     page = (
         "<!doctype html><html><head><meta charset=\"utf-8\">"
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+        "<link rel=\"icon\" href=\"cover.jpg\">"
         "<title>%s</title></head><body style=\"font-family:sans-serif;max-width:40rem;margin:2rem auto;padding:0 1rem\">"
+        "<img src=\"cover.jpg\" alt=\"\" style=\"width:160px;border-radius:12px\">"
         "<h1>%s</h1><p>Podcast feed: <code>%s/feed.xml</code></p><ul>%s</ul></body></html>"
     ) % (escape(SHOW_TITLE), escape(SHOW_TITLE), base, "".join(rows))
 
