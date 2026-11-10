@@ -8,6 +8,14 @@
     <itunes:author>Morning Brief</itunes:author>
     <itunes:explicit>false</itunes:explicit>
     <item>
+      <title>Morning Brief: Tuesday, November 10</title>
+      <description>Good morning, Shahriar. This is your morning brief for Tuesday, November 10. Weather today is 4 degrees Celsius, mainly clear. The high will be 10 and the low 3 degrees Celsius. Chance of precipitation is 0 percent. You have 2 appointments in the next 24 hours: 8:30 AM, Sales review in the central region; 4:00 PM, Meeting with Mr. Abshahi. Now, the top 5 stories in AI today. First, from TechCrunch</description>
+      <pubDate>Tue, 10 Nov 2026 05:00:00 +0000</pubDate>
+      <guid isPermaLink="false">morning-brief-2026-11-10</guid>
+      <enclosure url="https://shahriar-dadgar.github.io/morning-brief-podcast/episodes/2026-11-10.mp3" length="690192" type="audio/mpeg"/>
+      <itunes:duration>115</itunes:duration>
+    </item>
+    <item>
       <title>Morning Brief: Monday, November 9</title>
       <description>Good morning, Shahriar. This is your morning brief for Monday, November 9. Weather today is 8 degrees, partly cloudy. The high will be 13 and the low 5 degrees. Chance of precipitation is 43 percent. You have no appointments scheduled in the next 24 hours. Now, the top 5 stories in AI today. First, from WIRED: World Models Will Soon Be Inescapable. World models represent a shift from text-based AI</description>
       <pubDate>Mon, 09 Nov 2026 05:00:00 +0000</pubDate>
