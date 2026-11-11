@@ -1,3 +1,4 @@
+import re
 #!/usr/bin/env python3
 """Morning Brief podcast builder.
 
@@ -249,6 +250,9 @@ padding:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .meta{color:var(--muted);font-size:.9rem;margin:0 0 1rem}
 audio{width:100%;margin:.25rem 0 1rem}
 .summary{margin:0}
+.summary ul.points{list-style:disc;padding-left:1.2rem}
+.summary ul.points ul{list-style:circle;padding-left:1.2rem;margin:.2rem 0}
+.summary li{border:0;padding:.15rem 0}
 .actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.25rem}
 .btn{display:inline-block;font:inherit;font-size:.9rem;padding:.5rem .9rem;border-radius:10px;
 border:1px solid var(--line);background:transparent;color:var(--ink);text-decoration:none;cursor:pointer}
@@ -296,6 +300,47 @@ def page_shell(title, inner, prefix=""):
     ) % (prefix, prefix, escape(title), PAGE_CSS, inner)
 
 
+def brief_points(meta):
+    """Bulleted section titles for the front page (no news text)."""
+    script = meta.get("script") or ""
+    paras = [" ".join(x.split()) for x in script.split("\n\n") if x.strip()]
+    items = []
+    for para in paras:
+        low = para.lower()
+        if low.startswith("weather"):
+            items.append(re.split(r"(?<=[a-z])\. ", para)[0].rstrip(".") + ".")
+        elif low.startswith("you have"):
+            head, _, rest = para.partition(":")
+            if rest:
+                items.append(head.strip() + ":")
+                for ev in rest.strip().rstrip(".").split(";"):
+                    items.append("  " + ev.strip())
+            else:
+                items.append(para)
+        elif low.startswith("now, the top"):
+            m = re.search(r"top (\d+)", low)
+            items.append("Top %s stories in AI today" % (m.group(1) if m else ""))
+    if not items:
+        return None
+    out, sub = '<ul class="points">', False
+    for it in items:
+        if it.startswith("  "):
+            if not sub:
+                out += "<ul>"
+                sub = True
+            out += "<li>%s</li>" % escape(shown(it.strip()))
+        else:
+            if sub:
+                out += "</ul></li>"
+                sub = False
+            out += "<li>%s" % escape(shown(it))
+            if not it.endswith(":"):
+                out += "</li>"
+    if sub:
+        out += "</ul></li>"
+    return out + "</ul>"
+
+
 def build_index(base):
     episodes = load_episodes()
 
@@ -335,13 +380,13 @@ def build_index(base):
             '<section class="latest"><span class="label">Latest episode</span>'
             "<h2>%s</h2><p class=\"meta\">%s</p>"
             '<audio controls preload="metadata" src="episodes/%s.mp3"></audio>'
-            '<p class="summary">%s</p>'
+            '<div class="summary">%s</div>'
             '<div class="actions">%s</div></section>'
             % (
                 escape(latest["title"]),
                 escape(pretty_meta(latest)),
                 latest["date"],
-                escape(shown(latest["description"])),
+                brief_points(latest) or escape(shown(latest["description"])),
                 actions,
             )
         )
