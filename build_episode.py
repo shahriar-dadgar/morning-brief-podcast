@@ -131,6 +131,7 @@ def save_episode(date_text, script):
         "date": date_text,
         "title": "%s: %s" % (SHOW_TITLE, pretty),
         "description": description,
+        "script": script,
         "duration": duration_seconds(mp3_path, script),
         "bytes": mp3_path.stat().st_size,
     }
@@ -144,7 +145,7 @@ def prune():
     dates = sorted((p.stem for p in EPISODES.glob("*.json")), reverse=True)
 
     for old in dates[KEEP_EPISODES:]:
-        for ext in (".json", ".mp3"):
+        for ext in (".json", ".mp3", ".html"):
             (EPISODES / (old + ext)).unlink(missing_ok=True)
 
 
@@ -185,7 +186,7 @@ def build_feed(base):
         )
 
         title = escape(meta["title"])
-        description = escape(meta["description"])
+        description = escape(shown(meta["description"]))
         audio_url = "%s/episodes/%s.mp3" % (base, date_text)
 
         items.append(
@@ -223,26 +224,183 @@ def build_feed(base):
     (DOCS / "feed.xml").write_text(feed, encoding="utf-8")
 
 
-def build_index(base):
-    rows = []
+PAGE_TITLE = os.environ.get("PAGE_TITLE", "Morning Brief for Shahriar")
+PAGE_TAGLINE = "Your daily spoken brief: weather, schedule and the top AI news."
 
-    for meta in load_episodes():
-        rows.append(
-            "<li><strong>%s</strong><br>"
-            '<audio controls preload="none" src="episodes/%s.mp3"></audio></li>'
-            % (escape(meta["title"]), meta["date"])
+PAGE_CSS = """
+:root{--bg:#f6f8fb;--card:#ffffff;--ink:#12263f;--muted:#5a6b80;--line:#dbe3ee;
+--accent:#f28c28;--on-accent:#1b0f02;--accent-ink:#a84a05;--accent-soft:#fdebd7}
+@media (prefers-color-scheme:dark){:root{--bg:#0a1626;--card:#11233a;--ink:#e8eef6;
+--muted:#9fb0c4;--line:#223653;--accent:#f5a04a;--on-accent:#1b0f02;--accent-ink:#f5a04a;--accent-soft:#3a2a14}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:44rem;margin:0 auto;padding:2rem 1rem 3rem}
+header{display:flex;gap:1.25rem;align-items:center;margin-bottom:1.75rem}
+header img{width:96px;height:96px;border-radius:16px;flex:none}
+h1{font-size:1.6rem;line-height:1.2;margin:0 0 .25rem}
+header p{margin:0;color:var(--muted)}
+.label{display:inline-block;font-size:.75rem;font-weight:700;letter-spacing:.08em;
+text-transform:uppercase;color:var(--accent-ink);background:var(--accent-soft);
+padding:.2rem .6rem;border-radius:999px;margin-bottom:.75rem}
+.latest{background:var(--card);border:1px solid var(--line);border-radius:18px;
+padding:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.latest h2{font-size:1.35rem;line-height:1.3;margin:0 0 .25rem}
+.meta{color:var(--muted);font-size:.9rem;margin:0 0 1rem}
+audio{width:100%;margin:.25rem 0 1rem}
+.summary{margin:0}
+.actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.25rem}
+.btn{display:inline-block;font:inherit;font-size:.9rem;padding:.5rem .9rem;border-radius:10px;
+border:1px solid var(--line);background:transparent;color:var(--ink);text-decoration:none;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
+h3{font-size:1rem;margin:2.25rem 0 .75rem;color:var(--muted);font-weight:600}
+ul{list-style:none;margin:0;padding:0}
+li{border-top:1px solid var(--line);padding:.9rem 0}
+li strong{display:block}
+li span{color:var(--muted);font-size:.85rem}
+li audio{margin:.5rem 0 0;height:36px}
+.empty{color:var(--muted)}
+footer{margin-top:2.5rem;color:var(--muted);font-size:.85rem;word-break:break-all}
+code{background:var(--accent-soft);padding:.1rem .35rem;border-radius:6px}
+a{color:var(--accent-ink)}
+.back{text-decoration:none;font-size:.9rem}
+.transcript p{margin:0 0 1rem}
+li .links{display:block;margin-top:.35rem;font-size:.85rem}
+"""
+
+
+def shown(text):
+    # The script spells the name "Shahriaar" so the voice pronounces it well;
+    # show the normal spelling on the web page and in the feed.
+    return str(text).replace("Shahriaar", "Shahriar")
+
+
+def pretty_meta(meta):
+    day = dt.date.fromisoformat(meta["date"])
+
+    minutes = max(1, int(round(meta["duration"] / 60.0)))
+
+    return "%s, %d %s %d · %d min" % (
+        day.strftime("%A"), day.day, day.strftime("%B"), day.year, minutes
+    )
+
+
+def page_shell(title, inner, prefix=""):
+    return (
+        '<!doctype html><html lang="en"><head><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width, initial-scale=1">'
+        '<link rel="icon" href="%scover.jpg">'
+        '<link rel="alternate" type="application/rss+xml" href="%sfeed.xml">'
+        "<title>%s</title><style>%s</style></head>"
+        '<body><div class="wrap">%s</div></body></html>'
+    ) % (prefix, prefix, escape(title), PAGE_CSS, inner)
+
+
+def build_index(base):
+    episodes = load_episodes()
+
+    feed_url = base + "/feed.xml"
+
+    inner = (
+        '<header><img src="cover.jpg" alt=""><div><h1>%s</h1><p>%s</p></div></header>'
+        % (escape(PAGE_TITLE), escape(PAGE_TAGLINE))
+    )
+
+    if not episodes:
+        inner += '<p class="empty">No episodes yet.</p>'
+
+    else:
+        latest = episodes[0]
+
+        actions = ""
+
+        if latest.get("script"):
+            actions += (
+                '<a class="btn primary" href="episodes/%s.html">Read full transcript</a>'
+                % latest["date"]
+            )
+
+        actions += (
+            '<a class="btn" href="episodes/%s.mp3" download>Download MP3</a>'
+            % latest["date"]
         )
 
-    page = (
-        "<!doctype html><html><head><meta charset=\"utf-8\">"
-        "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
-        "<link rel=\"icon\" href=\"cover.jpg\">"
-        "<title>%s</title></head><body style=\"font-family:sans-serif;max-width:40rem;margin:2rem auto;padding:0 1rem\">"
-        "<img src=\"cover.jpg\" alt=\"\" style=\"width:160px;border-radius:12px\">"
-        "<h1>%s</h1><p>Podcast feed: <code>%s/feed.xml</code></p><ul>%s</ul></body></html>"
-    ) % (escape(SHOW_TITLE), escape(SHOW_TITLE), base, "".join(rows))
+        actions += (
+            '<button class="btn" type="button" '
+            "onclick=\"navigator.clipboard.writeText('%s').then(function(){this.textContent='Copied'}.bind(this))\">"
+            "Copy podcast feed link</button>" % feed_url
+        )
 
-    (DOCS / "index.html").write_text(page, encoding="utf-8")
+        inner += (
+            '<section class="latest"><span class="label">Latest episode</span>'
+            "<h2>%s</h2><p class=\"meta\">%s</p>"
+            '<audio controls preload="metadata" src="episodes/%s.mp3"></audio>'
+            '<p class="summary">%s</p>'
+            '<div class="actions">%s</div></section>'
+            % (
+                escape(latest["title"]),
+                escape(pretty_meta(latest)),
+                latest["date"],
+                escape(shown(latest["description"])),
+                actions,
+            )
+        )
+
+        older = episodes[1:]
+
+        if older:
+            rows = []
+
+            for meta in older:
+                links = ""
+
+                if meta.get("script"):
+                    links = (
+                        '<span class="links"><a href="episodes/%s.html">Transcript</a></span>'
+                        % meta["date"]
+                    )
+
+                rows.append(
+                    "<li><strong>%s</strong><span>%s</span>"
+                    '<audio controls preload="none" src="episodes/%s.mp3"></audio>%s</li>'
+                    % (escape(meta["title"]), escape(pretty_meta(meta)), meta["date"], links)
+                )
+
+            inner += "<h3>Previous episodes</h3><ul>%s</ul>" % "".join(rows)
+
+    inner += (
+        "<footer>Podcast feed for your podcast app: <code>%s</code></footer>" % feed_url
+    )
+
+    (DOCS / "index.html").write_text(page_shell(PAGE_TITLE, inner), encoding="utf-8")
+
+
+def build_transcripts():
+    for meta in load_episodes():
+        script = meta.get("script")
+
+        if not script:
+            continue
+
+        paragraphs = "".join(
+            "<p>%s</p>" % escape(shown(p.strip()))
+            for p in script.split("\n\n")
+            if p.strip()
+        )
+
+        inner = (
+            '<a class="back" href="../">← All episodes</a>'
+            "<h1 style=\"margin-top:1rem\">%s</h1>"
+            '<p class="meta">%s</p>'
+            '<audio controls preload="metadata" src="%s.mp3"></audio>'
+            '<div class="transcript">%s</div>'
+            % (escape(meta["title"]), escape(pretty_meta(meta)), meta["date"], paragraphs)
+        )
+
+        (EPISODES / (meta["date"] + ".html")).write_text(
+            page_shell(meta["title"], inner, prefix="../"), encoding="utf-8"
+        )
+
 
 
 # ------------------------------------------------------------
@@ -267,6 +425,7 @@ def main():
 
     build_feed(base)
     build_index(base)
+    build_transcripts()
 
     print("Episode %s ready. Feed: %s/feed.xml" % (date_text, base))
 
