@@ -10,6 +10,14 @@
     <itunes:image href="https://shahriar-dadgar.github.io/morning-brief-podcast/cover.jpg"/>
     <image><url>https://shahriar-dadgar.github.io/morning-brief-podcast/cover.jpg</url><title>Morning Brief</title><link>https://shahriar-dadgar.github.io/morning-brief-podcast/</link></image>
     <item>
+      <title>Morning Brief: Wednesday, November 25</title>
+      <description>Good morning, Shahriar. Today is Wednesday, November 25. This is your morning brief. Weather today is 9 degrees Celsius, clear skies. The high will be 19 and the low 9 degrees Celsius. Chance of precipitation is 0 percent. You have 8 appointments in the next 24 hours: 10:00 AM, Meeting with Mr. Fallah; 10:00 AM, innovation Hub; 11:00 AM, PR-cheese -(development region); 11:30 AM, PR-cheese -(west</description>
+      <pubDate>Wed, 25 Nov 2026 05:00:00 +0000</pubDate>
+      <guid isPermaLink="false">morning-brief-2026-11-25</guid>
+      <enclosure url="https://shahriar-dadgar.github.io/morning-brief-podcast/episodes/2026-11-25.mp3" length="853488" type="audio/mpeg"/>
+      <itunes:duration>142</itunes:duration>
+    </item>
+    <item>
       <title>Morning Brief: Tuesday, November 24</title>
       <description>Good morning, Shahriar. Today is Tuesday, November 24. This is your morning brief. Weather today is 10 degrees Celsius, clear skies. The high will be 19 and the low 9 degrees Celsius. Chance of precipitation is 0 percent. You have 2 appointments in the next 24 hours: 3:00 PM, Financial issues capillary line; 4:00 PM, Meeting with Mr. Abshahi. Now, the top 5 stories in AI today. First, from The Ve</description>
       <pubDate>Tue, 24 Nov 2026 05:00:00 +0000</pubDate>
@@ -112,14 +120,6 @@
       <guid isPermaLink="false">morning-brief-2026-11-11</guid>
       <enclosure url="https://shahriar-dadgar.github.io/morning-brief-podcast/episodes/2026-11-11.mp3" length="643104" type="audio/mpeg"/>
       <itunes:duration>107</itunes:duration>
-    </item>
-    <item>
-      <title>Morning Brief: Tuesday, November 10</title>
-      <description>Good morning, Shahriar. This is your morning brief for Tuesday, November 10. Weather today is 4 degrees Celsius, mainly clear. The high will be 10 and the low 3 degrees Celsius. Chance of precipitation is 0 percent. You have 2 appointments in the next 24 hours: 8:30 AM, Sales review in the central region; 4:00 PM, Meeting with Mr. Abshahi. Now, the top 5 stories in AI today. First, from TechCrunch</description>
-      <pubDate>Tue, 10 Nov 2026 05:00:00 +0000</pubDate>
-      <guid isPermaLink="false">morning-brief-2026-11-10</guid>
-      <enclosure url="https://shahriar-dadgar.github.io/morning-brief-podcast/episodes/2026-11-10.mp3" length="691632" type="audio/mpeg"/>
-      <itunes:duration>115</itunes:duration>
     </item>
   </channel>
 </rss>
