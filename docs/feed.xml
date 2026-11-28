@@ -10,6 +10,14 @@
     <itunes:image href="https://shahriar-dadgar.github.io/morning-brief-podcast/cover.jpg"/>
     <image><url>https://shahriar-dadgar.github.io/morning-brief-podcast/cover.jpg</url><title>Morning Brief</title><link>https://shahriar-dadgar.github.io/morning-brief-podcast/</link></image>
     <item>
+      <title>Morning Brief: Saturday, November 28</title>
+      <description>Good morning, Shahriar. Today is Saturday, November 28. This is your morning brief. You have 3 appointments in the next 24 hours: 12:00 PM, Logistics system; 1:00 PM, Group Finance Committee; 2:00 PM, Tracking the collection of chain sales receivables. Now, the top 2 stories in AI today. First, from WIRED: A New Breed of Chip Runs AI Models Using Waves of Light. German company Q.ANT is developing</description>
+      <pubDate>Sat, 28 Nov 2026 05:00:00 +0000</pubDate>
+      <guid isPermaLink="false">morning-brief-2026-11-28</guid>
+      <enclosure url="https://shahriar-dadgar.github.io/morning-brief-podcast/episodes/2026-11-28.mp3" length="636336" type="audio/mpeg"/>
+      <itunes:duration>106</itunes:duration>
+    </item>
+    <item>
       <title>Morning Brief: Friday, November 27</title>
       <description>Good morning, Shahriar. Today is Friday, November 27. This is your morning brief. Weather today is 8 degrees Celsius, clear skies. The high will be 15 and the low 8 degrees Celsius. Chance of precipitation is 0 percent. You have no appointments scheduled in the next 24 hours. Now, the top 5 stories in AI today. First, from Hugging Face: Building on Nemotron 3.5 Parse: Open Data, Fine-Tuning, and </description>
       <pubDate>Fri, 27 Nov 2026 05:00:00 +0000</pubDate>
@@ -112,14 +120,6 @@
       <guid isPermaLink="false">morning-brief-2026-11-14</guid>
       <enclosure url="https://shahriar-dadgar.github.io/morning-brief-podcast/episodes/2026-11-14.mp3" length="1511712" type="audio/mpeg"/>
       <itunes:duration>251</itunes:duration>
-    </item>
-    <item>
-      <title>Morning Brief: Friday, November 13</title>
-      <description>Good morning, Shahriar. Today is Friday, November 13. This is your morning brief. Weather today is 4 degrees Celsius, clear skies. The high will be 13 and the low 4 degrees Celsius. Chance of precipitation is 0 percent. You have no appointments scheduled in the next 24 hours. Now, the top 5 stories in AI today. First, from The Verge: Google releases Gemini 4 Hydrogen model across Search and Gemin</description>
-      <pubDate>Fri, 13 Nov 2026 05:00:00 +0000</pubDate>
-      <guid isPermaLink="false">morning-brief-2026-11-13</guid>
-      <enclosure url="https://shahriar-dadgar.github.io/morning-brief-podcast/episodes/2026-11-13.mp3" length="1308816" type="audio/mpeg"/>
-      <itunes:duration>218</itunes:duration>
     </item>
   </channel>
 </rss>
